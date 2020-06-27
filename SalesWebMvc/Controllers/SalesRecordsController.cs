@@ -9,9 +9,9 @@ namespace SalesWebMvc.Controllers
 {
     public class SalesRecordsController : Controller
     {
-        private readonly SalesRecordsService _salesRecordsService;
+        private readonly SalesRecordService _salesRecordsService;
 
-        public SalesRecordsController(SalesRecordsService salesRecordsService)
+        public SalesRecordsController(SalesRecordService salesRecordsService)
         {
             _salesRecordsService = salesRecordsService;
         }
@@ -25,16 +25,30 @@ namespace SalesWebMvc.Controllers
         {
             if (!minDate.HasValue)
                 minDate = new DateTime(DateTime.Now.Year, 1, 1);
+
             if (!maxDate.HasValue)
                 maxDate = DateTime.Now;
+
             ViewData["minDate"] = minDate.Value.ToString("yyyy-MM-dd");
             ViewData["maxDate"] = maxDate.Value.ToString("yyyy-MM-dd");
             List<Models.SalesRecord> result = await _salesRecordsService.FindByDateAsync(minDate, maxDate);
             return View(result);
         }
-        public IActionResult GroupingSearch()
+
+        public async Task<IActionResult> GroupingSearch(DateTime? minDate, DateTime? maxDate)
         {
-            return View();
+            if (!minDate.HasValue)
+                minDate = new DateTime(DateTime.Now.Year, 1, 1);
+
+            if (!maxDate.HasValue)
+                maxDate = DateTime.Now;
+
+            ViewData["minDate"] = minDate.Value.ToString("yyyy-MM-dd");
+            ViewData["maxDate"] = maxDate.Value.ToString("yyyy-MM-dd");
+
+            var result = await _salesRecordsService.FindByDateGroupingAsync(minDate, maxDate);
+
+            return View(result);
         }
     }
 }
